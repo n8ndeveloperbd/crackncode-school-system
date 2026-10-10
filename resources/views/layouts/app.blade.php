@@ -858,7 +858,7 @@
         </div>
         <div class="topbar-right" style="display:flex; align-items:center; gap:12px;">
             {{-- License Status Indicator --}}
-            @php $currentLicense = \App\Services\LicenseService::check(); @endphp
+            @php $currentLicense = \App\Services\LicenseService::check(auth()->user()); @endphp
             @if(!empty($currentLicense['is_lifetime']))
                 <span style="display:inline-flex; align-items:center; gap:5px; background:#ecfdf5; color:#065f46; border:1px solid #a7f3d0; padding:4px 10px; border-radius:20px; font-size:11.5px; font-weight:700;">
                     <i class="bi bi-patch-check-fill" style="color:#10b981;"></i> আজীবন লাইসেন্স

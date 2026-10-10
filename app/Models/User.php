@@ -25,6 +25,10 @@ class User extends Authenticatable
         'role',
         'phone',
         'status',
+        'license_code',
+        'license_type',
+        'license_expires_at',
+        'license_activated_at',
     ];
 
     public function isSuperAdmin(): bool
@@ -52,6 +56,55 @@ class User extends Authenticatable
         };
     }
 
+    public function hasActiveLicense(): bool
+    {
+        if ($this->isSuperAdmin()) {
+            return true;
+        }
+
+        if ($this->license_type === 'lifetime') {
+            return true;
+        }
+
+        if ($this->license_expires_at && now()->lessThan($this->license_expires_at)) {
+            return true;
+        }
+
+        return false;
+    }
+
+    public function getLicenseRemainingHumanAttribute(): string
+    {
+        if ($this->isSuperAdmin()) {
+            return 'আনলিমিটেড (Master)';
+        }
+
+        if ($this->license_type === 'lifetime') {
+            return 'আজীবন লাইসেন্স (Lifetime)';
+        }
+
+        if (!$this->license_expires_at) {
+            return 'লাইসেন্সহীন (Unlicensed)';
+        }
+
+        $now = now();
+        if ($now->greaterThan($this->license_expires_at)) {
+            return 'মেয়াদ শেষ (Expired)';
+        }
+
+        $diffMinutes = (int) $now->diffInMinutes($this->license_expires_at);
+        $diffHours = (int) $now->diffInHours($this->license_expires_at);
+        $diffDays = (int) ceil($now->diffInHours($this->license_expires_at) / 24);
+
+        if ($diffMinutes < 60) {
+            return "{$diffMinutes} মিনিট বাকি";
+        } elseif ($diffHours < 24) {
+            return "{$diffHours} ঘণ্টা বাকি";
+        } else {
+            return "{$diffDays} দিন বাকি";
+        }
+    }
+
     /**
      * The attributes that should be hidden for serialization.
      *
@@ -72,6 +125,8 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'license_expires_at' => 'datetime',
+            'license_activated_at' => 'datetime',
         ];
     }
 }

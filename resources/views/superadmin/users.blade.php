@@ -22,6 +22,7 @@
                     <th>ব্যবহারকারী (User)</th>
                     <th>দায়িত্ব (Role)</th>
                     <th>ইমেইল ঠিকানা</th>
+                    <th>লাইসেন্স অবস্থা (License)</th>
                     <th>ফোন নম্বর</th>
                     <th>অবস্থা (Status)</th>
                     <th>তৈরির তারিখ</th>
@@ -56,12 +57,29 @@
                         @endif
                     </td>
                     <td style="font-family:var(--font-en); font-weight:500;">{{ $u->email }}</td>
+                    <td>
+                        @if($u->license_type === 'lifetime')
+                            <span class="badge badge-purple"><i class="bi bi-patch-check-fill"></i> আজীবন</span>
+                        @elseif($u->hasActiveLicense())
+                            <span class="badge badge-green" title="কোড: {{ $u->license_code }}">
+                                <i class="bi bi-clock-history"></i> {{ $u->license_remaining_human }}
+                            </span>
+                        @elseif($u->license_code)
+                            <span class="badge badge-red" title="কোড: {{ $u->license_code }}">
+                                <i class="bi bi-x-circle"></i> মেয়াদ শেষ
+                            </span>
+                        @else
+                            <span class="badge" style="color:#b91c1c; background:#fef2f2; border:1px solid #fecaca; font-size:11.5px;">
+                                <i class="bi bi-key"></i> লাইসেন্সবিহীন
+                            </span>
+                        @endif
+                    </td>
                     <td style="font-family:var(--font-en);">{{ $u->phone ?: '—' }}</td>
                     <td>
                         @if($u->status === 'active')
-                            <span class="badge badge-green"><i class="bi bi-check-circle"></i> সক্রিয় (Active)</span>
+                            <span class="badge badge-green"><i class="bi bi-check-circle"></i> সক্রিয়</span>
                         @else
-                            <span class="badge badge-red"><i class="bi bi-pause-circle"></i> নিষ্ক্রিয় (Inactive)</span>
+                            <span class="badge badge-red"><i class="bi bi-pause-circle"></i> নিষ্ক্রিয়</span>
                         @endif
                     </td>
                     <td style="font-size:12px; font-family:var(--font-en);">{{ $u->created_at ? $u->created_at->format('d/m/Y') : '—' }}</td>

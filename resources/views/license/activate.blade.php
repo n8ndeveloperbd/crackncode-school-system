@@ -136,6 +136,18 @@
     </div>
     @endif
 
+    @if(auth()->check())
+    <div style="background:#f8fafc; border-radius:12px; padding:10px 14px; margin-bottom:18px; font-size:12.5px; text-align:left; border:1.5px solid #e2e8f0; display:flex; align-items:center; gap:10px;">
+        <div style="width:36px; height:36px; border-radius:50%; background:#eef2ff; color:#4f46e5; display:flex; align-items:center; justify-content:center; font-size:16px; flex-shrink:0;">
+            <i class="bi bi-person-badge-fill"></i>
+        </div>
+        <div>
+            <div style="font-weight:700; color:#1e293b;">{{ auth()->user()->name }} <span class="badge badge-purple" style="font-size:10px; margin-left:4px;">{{ auth()->user()->role_label }}</span></div>
+            <div style="color:#64748b; font-size:11.5px;">{{ auth()->user()->email }}</div>
+        </div>
+    </div>
+    @endif
+
     <div class="status-box">
         <div class="d-flex justify-content-between mb-1">
             <span class="text-muted">বর্তমান অবস্থা:</span>

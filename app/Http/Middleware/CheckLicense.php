@@ -14,22 +14,30 @@ class CheckLicense
      */
     public function handle(Request $request, Closure $next): Response
     {
-        // 1. Super Admin always has full access
-        if (auth()->check() && auth()->user()->isSuperAdmin()) {
+        // 1. If not authenticated, allow request (auth middleware handles login requirement)
+        if (!auth()->check()) {
             return $next($request);
         }
 
-        // 2. Allow license activation routes and logout
+        // 2. Super Admin always has full master access
+        if (auth()->user()->isSuperAdmin()) {
+            return $next($request);
+        }
+
+        // 3. Allow license activation routes and logout
         if ($request->routeIs('license.activate', 'license.submit', 'logout')) {
             return $next($request);
         }
 
-        // 3. Verify software license validity
-        $check = LicenseService::check();
+        // 4. Verify user's specific account license
+        $check = LicenseService::check(auth()->user());
 
         if (!$check['active']) {
-            return redirect()->route('license.activate')
-                ->with('error', 'আপনার সফটওয়্যারের ট্রায়াল বা লাইসেন্সের মেয়াদ শেষ হয়েছে! পুনরায় ব্যবহারের জন্য একটি বৈধ লাইসেন্স কোড প্রবেশ করান।');
+            $message = empty(auth()->user()->license_code)
+                ? 'আপনার অ্যাকাউন্টে সক্রিয় কোনো লাইসেন্স কোড নেই। সফটওয়্যারে প্রবেশের জন্য অনুগ্রহ করে একটি বৈধ লাইসেন্স কোড দিন।'
+                : 'আপনার অ্যাকাউন্টের লাইসেন্সের মেয়াদ শেষ হয়েছে! পুনরায় ব্যবহারের জন্য একটি নতুন লাইসেন্স কোড প্রবেশ করান।';
+
+            return redirect()->route('license.activate')->with('error', $message);
         }
 
         return $next($request);

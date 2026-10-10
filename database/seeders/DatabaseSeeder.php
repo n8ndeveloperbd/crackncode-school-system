@@ -45,12 +45,12 @@ class DatabaseSeeder extends Seeder
             ]
         );
 
-        // Active Default Software License (7 Days Initial Grace Period)
-        \App\Models\Setting::updateOrCreate(['key' => 'license_status'], ['value' => 'active']);
-        \App\Models\Setting::updateOrCreate(['key' => 'license_type'], ['value' => 'trial_custom']);
-        \App\Models\Setting::updateOrCreate(['key' => 'license_code'], ['value' => 'CNC-WELCOME-TRIAL']);
-        \App\Models\Setting::updateOrCreate(['key' => 'license_expires_at'], ['value' => now()->addDays(7)->toDateTimeString()]);
-        \App\Models\Setting::updateOrCreate(['key' => 'license_activated_at'], ['value' => now()->toDateTimeString()]);
+        // License settings initial state (Requires activation code)
+        \App\Models\Setting::updateOrCreate(['key' => 'license_status'], ['value' => 'unlicensed']);
+        \App\Models\Setting::updateOrCreate(['key' => 'license_type'], ['value' => 'none']);
+        \App\Models\Setting::updateOrCreate(['key' => 'license_code'], ['value' => null]);
+        \App\Models\Setting::updateOrCreate(['key' => 'license_expires_at'], ['value' => null]);
+        \App\Models\Setting::updateOrCreate(['key' => 'license_activated_at'], ['value' => null]);
 
         // Pre-generate sample unused licenses ready for use
         if (\App\Models\License::count() === 0) {

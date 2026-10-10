@@ -12,7 +12,7 @@ class LicenseController extends Controller
      */
     public function showActivationForm()
     {
-        $licenseInfo = LicenseService::check();
+        $licenseInfo = LicenseService::check(auth()->user());
         return view('license.activate', compact('licenseInfo'));
     }
 
@@ -28,8 +28,8 @@ class LicenseController extends Controller
         ]);
 
         try {
-            $userEmail = auth()->check() ? auth()->user()->email : null;
-            $result = LicenseService::activate($request->code, $userEmail);
+            $user = auth()->user();
+            $result = LicenseService::activate($request->code, $user);
 
             $expiresText = $result['expires_at']
                 ? $result['expires_at']->format('d M Y, h:i A') . ' পর্যন্ত'

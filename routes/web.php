@@ -146,7 +146,7 @@ Route::middleware(['auth'])->group(function () {
 });
 
 // Meals (খোরাকি)
-Route::middleware(['auth'])->group(function () {
+Route::middleware(['auth', 'license'])->group(function () {
     Route::get('/meals',              [App\Http\Controllers\MealController::class, 'index'])->name('meals.index');
     Route::get('/meals/create',       [App\Http\Controllers\MealController::class, 'create'])->name('meals.create');
     Route::post('/meals',             [App\Http\Controllers\MealController::class, 'store'])->name('meals.store');
