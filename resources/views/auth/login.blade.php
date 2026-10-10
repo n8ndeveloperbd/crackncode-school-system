@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>লগইন — CrackNCode</title>
+    <title>লগইন — {{ setting('school_name', 'CrackNCode Academy') }}</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -32,37 +32,70 @@
         }
         .login-card {
             background: #ffffff;
-            border-radius: 20px;
-            padding: 40px 36px;
-            box-shadow: 0 25px 60px -12px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(255, 255, 255, 0.1);
+            border-radius: 22px;
+            padding: 38px 34px;
+            box-shadow: 0 25px 60px -12px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.1);
+            position: relative;
         }
-        .brand-icon {
-            width: 60px;
-            height: 60px;
+        .school-logo-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+        .school-logo-img {
+            max-width: 85px;
+            max-height: 85px;
+            object-fit: contain;
+            border-radius: 14px;
+            box-shadow: 0 4px 14px rgba(0,0,0,0.1);
+            border: 2px solid #eef2ff;
+            padding: 3px;
+            background: #ffffff;
+        }
+        .school-logo-badge {
+            width: 64px;
+            height: 64px;
             background: var(--primary-gradient);
-            border-radius: 16px;
+            border-radius: 18px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 28px;
+            font-size: 30px;
             color: #ffffff;
-            margin: 0 auto 16px;
             box-shadow: 0 8px 24px rgba(79, 70, 229, 0.35);
         }
         .brand-title {
-            font-size: 24px;
+            font-size: 22px;
             font-weight: 800;
             color: #0f172a;
             text-align: center;
             margin-bottom: 4px;
-            letter-spacing: -0.5px;
-            font-family: 'Plus Jakarta Sans', sans-serif;
+            letter-spacing: -0.3px;
+            line-height: 1.3;
         }
         .brand-sub {
             font-size: 13px;
             color: #64748b;
             text-align: center;
-            margin-bottom: 28px;
+            margin-bottom: 22px;
+        }
+        .software-pill {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            background: #f1f5f9;
+            border: 1px solid #e2e8f0;
+            border-radius: 20px;
+            padding: 4px 12px;
+            font-size: 11.5px;
+            color: #475569;
+            margin: 0 auto 20px;
+            width: fit-content;
+        }
+        .software-pill strong {
+            color: #4f46e5;
             font-family: 'Plus Jakarta Sans', sans-serif;
         }
         .form-label {
@@ -149,11 +182,24 @@
 <body>
 <div class="login-wrap">
     <div class="login-card">
-        <div class="brand-icon">
-            <i class="bi bi-code-slash"></i>
+        <!-- School Branding & Proper Logo -->
+        <div class="school-logo-container">
+            @if(setting('school_logo'))
+                <img src="{{ asset('storage/' . setting('school_logo')) }}" alt="School Logo" class="school-logo-img">
+            @else
+                <div class="school-logo-badge">
+                    <i class="bi bi-mortarboard-fill"></i>
+                </div>
+            @endif
         </div>
-        <div class="brand-title">CrackNCode</div>
-        <div class="brand-sub">Smart Institutional Management System</div>
+
+        <div class="brand-title">{{ setting('school_name', 'CrackNCode Academy') }}</div>
+        <div class="brand-sub">{{ setting('school_address') ?: 'বিদ্যালয় ও মাদ্রাসা ব্যবস্থাপনা পোর্টাল' }}</div>
+
+        <div class="software-pill">
+            <i class="bi bi-shield-check" style="color:#4f46e5;"></i>
+            Software by <strong>CrackNCode</strong>
+        </div>
 
         @if($errors->any())
         <div class="alert alert-danger mb-3">
@@ -164,6 +210,10 @@
 
         @if (session('status'))
         <div class="alert alert-success mb-3">{{ session('status') }}</div>
+        @endif
+
+        @if (session('error'))
+        <div class="alert alert-danger mb-3">{{ session('error') }}</div>
         @endif
 
         <form method="POST" action="{{ route('login') }}">

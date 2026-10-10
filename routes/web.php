@@ -5,14 +5,40 @@ use App\Http\Controllers\{
     AttendanceController, FeeController, FeeCategoryController,
     ExamController, SubjectController, ResultController,
     SalaryController, NoticeController, SettingsController,
-    ApiController, ClassController, SectionController
+    ApiController, ClassController, SectionController,
+    SuperAdminController, LicenseController
 };
 
-Route::get('/', fn() => redirect()->route('dashboard'));
+Route::get('/', function () {
+    if (auth()->check() && auth()->user()->isSuperAdmin()) {
+        return redirect()->route('super-admin.index');
+    }
+    return redirect()->route('dashboard');
+});
 
 require __DIR__.'/auth.php';
 
+// License Activation
 Route::middleware(['auth'])->group(function () {
+    Route::get('/license/activate', [LicenseController::class, 'showActivationForm'])->name('license.activate');
+    Route::post('/license/activate', [LicenseController::class, 'activate'])->name('license.submit');
+});
+
+// Super Admin Routes (Master Control Panel)
+Route::prefix('super-admin')->name('super-admin.')->middleware(['auth', 'super_admin'])->group(function () {
+    Route::get('/', [SuperAdminController::class, 'index'])->name('index');
+    Route::get('/licenses', [SuperAdminController::class, 'licenses'])->name('licenses');
+    Route::post('/licenses/generate', [SuperAdminController::class, 'generateLicense'])->name('licenses.generate');
+    Route::delete('/licenses/{license}', [SuperAdminController::class, 'deleteLicense'])->name('licenses.delete');
+
+    Route::get('/users', [SuperAdminController::class, 'users'])->name('users');
+    Route::post('/users', [SuperAdminController::class, 'createUser'])->name('users.create');
+    Route::put('/users/{user}', [SuperAdminController::class, 'updateUser'])->name('users.update');
+    Route::post('/users/{user}/toggle-status', [SuperAdminController::class, 'toggleUserStatus'])->name('users.toggle-status');
+    Route::delete('/users/{user}', [SuperAdminController::class, 'deleteUser'])->name('users.delete');
+});
+
+Route::middleware(['auth', 'license'])->group(function () {
     // Student import/export
     Route::get('/students/import',  [App\Http\Controllers\StudentImportController::class, 'index'])->name('students.import');
     Route::post('/students/import', [App\Http\Controllers\StudentImportController::class, 'import'])->name('students.import.store');
@@ -149,7 +175,7 @@ Route::middleware(['auth'])->group(function () {
 });
 
 // Designations
-Route::middleware(['auth'])->group(function () {
+Route::middleware(['auth', 'license'])->group(function () {
     Route::resource('designations', App\Http\Controllers\DesignationController::class)->except(['create','edit','show']);
     Route::post('designations/{designation}/toggle', [App\Http\Controllers\DesignationController::class, 'toggle'])->name('designations.toggle');
     Route::post('designations/reorder', [App\Http\Controllers\DesignationController::class, 'reorder'])->name('designations.reorder');

@@ -734,15 +734,36 @@
 <body>
 <aside class="sidebar" id="sidebar">
     <div class="sidebar-brand">
-        <div class="brand-icon">
-            <i class="bi bi-code-slash"></i>
-        </div>
-        <div class="brand-text">
-            <div class="name">CrackNCode</div>
+        @if(setting('school_logo'))
+            <img src="{{ asset('storage/' . setting('school_logo')) }}" alt="{{ setting('school_name', 'School') }}" style="width:40px; height:40px; border-radius:10px; object-fit:contain; background:#ffffff; padding:2px; box-shadow:0 4px 12px rgba(0,0,0,0.25); flex-shrink:0;">
+        @else
+            <div class="brand-icon">
+                <i class="bi bi-mortarboard-fill"></i>
+            </div>
+        @endif
+        <div class="brand-text" style="overflow:hidden;">
+            <div class="name" style="white-space:nowrap; text-overflow:ellipsis; overflow:hidden;" title="{{ setting('school_name', 'CrackNCode School') }}">
+                {{ setting('school_name', 'CrackNCode School') }}
+            </div>
             <div class="tagline">Smart School IMS</div>
         </div>
     </div>
     <nav class="sidebar-nav">
+        @if(auth()->check() && auth()->user()->isSuperAdmin())
+        <div class="nav-section-label" style="color:#a5b4fc; display:flex; align-items:center; gap:6px;">
+            <i class="bi bi-shield-lock-fill"></i> Master Control
+        </div>
+        <a href="{{ route('super-admin.index') }}" class="nav-item {{ request()->routeIs('super-admin.index') ? 'active' : '' }}" style="background:rgba(99,102,241,0.12); border-left:3px solid #818cf8;">
+            <i class="bi bi-speedometer2" style="color:#a5b4fc;"></i> সুপার অ্যাডমিন ড্যাশবোর্ড
+        </a>
+        <a href="{{ route('super-admin.licenses') }}" class="nav-item {{ request()->routeIs('super-admin.licenses*') ? 'active' : '' }}">
+            <i class="bi bi-key-fill" style="color:#a5b4fc;"></i> লাইসেন্স ম্যানেজার
+        </a>
+        <a href="{{ route('super-admin.users') }}" class="nav-item {{ request()->routeIs('super-admin.users*') ? 'active' : '' }}">
+            <i class="bi bi-people-fill" style="color:#a5b4fc;"></i> স্টাফ অ্যাকাউন্ট (Principal/Cashier)
+        </a>
+        @endif
+
         <div class="nav-section-label">Overview</div>
         <a href="{{ route('dashboard') }}" class="nav-item {{ request()->routeIs('dashboard') ? 'active' : '' }}">
             <i class="bi bi-grid-fill"></i> ড্যাশবোর্ড
@@ -835,7 +856,23 @@
                 <div class="breadcrumb-trail">@yield('breadcrumb', 'Home')</div>
             </div>
         </div>
-        <div class="topbar-right">
+        <div class="topbar-right" style="display:flex; align-items:center; gap:12px;">
+            {{-- License Status Indicator --}}
+            @php $currentLicense = \App\Services\LicenseService::check(); @endphp
+            @if($currentLicense['is_lifetime'])
+                <span style="display:inline-flex; align-items:center; gap:5px; background:#ecfdf5; color:#065f46; border:1px solid #a7f3d0; padding:4px 10px; border-radius:20px; font-size:11.5px; font-weight:700;">
+                    <i class="bi bi-patch-check-fill" style="color:#10b981;"></i> আজীবন লাইসেন্স
+                </span>
+            @elseif($currentLicense['is_valid'])
+                <span style="display:inline-flex; align-items:center; gap:5px; background:#eff6ff; color:#1e40af; border:1px solid #bfdbfe; padding:4px 10px; border-radius:20px; font-size:11.5px; font-weight:700;" title="মেয়াদ শেষ: {{ $currentLicense['expires_at'] ? $currentLicense['expires_at']->format('d/m/Y h:i A') : '' }}">
+                    <i class="bi bi-clock-history" style="color:#3b82f6;"></i> মেয়াদ: {{ $currentLicense['remaining_human'] }}
+                </span>
+            @else
+                <a href="{{ route('license.activate') }}" style="display:inline-flex; align-items:center; gap:5px; background:#fef2f2; color:#991b1b; border:1px solid #fecaca; padding:4px 10px; border-radius:20px; font-size:11.5px; font-weight:700; text-decoration:none;">
+                    <i class="bi bi-exclamation-triangle-fill" style="color:#ef4444;"></i> মেয়াদ শেষ! কোড দিন
+                </a>
+            @endif
+
             <a href="{{ route('attendance.index') }}" class="topbar-btn" title="উপস্থিতি">
                 <i class="bi bi-calendar-check"></i>
             </a>
@@ -844,9 +881,20 @@
             </a>
             <div class="user-chip">
                 <div class="user-avatar">{{ mb_substr(auth()->user()->name ?? 'C', 0, 1) }}</div>
-                <span class="user-name">{{ auth()->user()->name ?? 'Admin' }}</span>
+                <div>
+                    <span class="user-name">{{ auth()->user()->name ?? 'User' }}</span>
+                </div>
                 <i class="bi bi-chevron-down" style="font-size:10px; color:var(--text-muted);"></i>
                 <div class="user-dropdown">
+                    <div style="padding:10px 14px; border-bottom:1px solid var(--border); background:var(--bg);">
+                        <div style="font-weight:700; font-size:13px; color:var(--text-dark);">{{ auth()->user()->name }}</div>
+                        <div style="font-size:11px; color:var(--primary); font-weight:600;">{{ auth()->user()->role_label }}</div>
+                    </div>
+                    @if(auth()->user()->isSuperAdmin())
+                    <a href="{{ route('super-admin.index') }}" class="dropdown-item" style="color:#4f46e5; font-weight:700;">
+                        <i class="bi bi-shield-lock-fill"></i> সুপার অ্যাডমিন প্যানেল
+                    </a>
+                    @endif
                     <a href="{{ route('profile.edit') }}" class="dropdown-item">
                         <i class="bi bi-person"></i> প্রোফাইল
                     </a>

@@ -5,6 +5,9 @@ set -e
 touch database/database.sqlite
 chmod 666 database/database.sqlite
 
+# Ensure storage symlink exists
+php artisan storage:link || true
+
 # Run database migrations and seed default CrackNCode data
 php artisan migrate --force --seed
 

@@ -9,9 +9,73 @@ class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
-        // Admin Users
-        User::create(['name'=>'প্রধান শিক্ষক','email'=>'admin@school.com','password'=>Hash::make('password')]);
-        User::create(['name'=>'হিসাব রক্ষক','email'=>'accounts@school.com','password'=>Hash::make('password')]);
+        // 1. Super Admin (CrackNCode Owner / Developer)
+        User::updateOrCreate(
+            ['email' => 'superadmin@crackncode.com'],
+            [
+                'name' => 'Super Admin (CrackNCode)',
+                'password' => Hash::make('superadmin123'),
+                'role' => 'super_admin',
+                'phone' => '01788155379',
+                'status' => 'active'
+            ]
+        );
+
+        // 2. Principal User
+        User::updateOrCreate(
+            ['email' => 'admin@school.com'],
+            [
+                'name' => 'প্রধান শিক্ষক (Principal)',
+                'password' => Hash::make('password'),
+                'role' => 'principal',
+                'phone' => '01700000001',
+                'status' => 'active'
+            ]
+        );
+
+        // 3. Cashier User
+        User::updateOrCreate(
+            ['email' => 'accounts@school.com'],
+            [
+                'name' => 'হিসাব রক্ষক (Cashier)',
+                'password' => Hash::make('password'),
+                'role' => 'cashier',
+                'phone' => '01700000002',
+                'status' => 'active'
+            ]
+        );
+
+        // Active Default Software License (7 Days Initial Grace Period)
+        \App\Models\Setting::updateOrCreate(['key' => 'license_status'], ['value' => 'active']);
+        \App\Models\Setting::updateOrCreate(['key' => 'license_type'], ['value' => 'trial_custom']);
+        \App\Models\Setting::updateOrCreate(['key' => 'license_code'], ['value' => 'CNC-WELCOME-TRIAL']);
+        \App\Models\Setting::updateOrCreate(['key' => 'license_expires_at'], ['value' => now()->addDays(7)->toDateTimeString()]);
+        \App\Models\Setting::updateOrCreate(['key' => 'license_activated_at'], ['value' => now()->toDateTimeString()]);
+
+        // Pre-generate sample unused licenses ready for use
+        if (\App\Models\License::count() === 0) {
+            \App\Models\License::create([
+                'code' => 'CNC-30MIN-DEMO-TRIAL',
+                'type' => 'trial_30m',
+                'duration_minutes' => 30,
+                'client_name' => 'Sample 30 Min Demo',
+                'status' => 'unused'
+            ]);
+            \App\Models\License::create([
+                'code' => 'CNC-01HR-DEMO-TRIAL',
+                'type' => 'trial_1h',
+                'duration_minutes' => 60,
+                'client_name' => 'Sample 1 Hour Demo',
+                'status' => 'unused'
+            ]);
+            \App\Models\License::create([
+                'code' => 'CNC-LIFE-PRO-MASTER',
+                'type' => 'lifetime',
+                'duration_minutes' => null,
+                'client_name' => 'Sample Lifetime License',
+                'status' => 'unused'
+            ]);
+        }
 
         // Session
         $session = Session::create(['name'=>'2024-2025','start_date'=>'2024-01-01','end_date'=>'2024-12-31','is_current'=>true]);

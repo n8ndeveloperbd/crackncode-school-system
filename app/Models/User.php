@@ -22,7 +22,35 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'role',
+        'phone',
+        'status',
     ];
+
+    public function isSuperAdmin(): bool
+    {
+        return $this->role === 'super_admin';
+    }
+
+    public function isPrincipal(): bool
+    {
+        return in_array($this->role, ['principal', 'admin']);
+    }
+
+    public function isCashier(): bool
+    {
+        return in_array($this->role, ['cashier', 'accounts']);
+    }
+
+    public function getRoleLabelAttribute(): string
+    {
+        return match ($this->role) {
+            'super_admin' => 'সুপার অ্যাডমিন (Super Admin)',
+            'principal', 'admin' => 'অধ্যক্ষ / প্রধান শিক্ষক (Principal)',
+            'cashier', 'accounts' => 'হিসাব রক্ষক (Cashier)',
+            default => ucfirst($this->role),
+        };
+    }
 
     /**
      * The attributes that should be hidden for serialization.
