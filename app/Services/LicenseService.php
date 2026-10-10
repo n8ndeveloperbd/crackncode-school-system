@@ -23,6 +23,7 @@ class LicenseService
         if ($isLifetime) {
             return [
                 'active' => true,
+                'is_valid' => true,
                 'is_lifetime' => true,
                 'type' => 'lifetime',
                 'code' => $code,
@@ -34,6 +35,7 @@ class LicenseService
         if (!$expiresAtRaw) {
             return [
                 'active' => false,
+                'is_valid' => false,
                 'is_lifetime' => false,
                 'type' => $type,
                 'code' => $code,
@@ -48,6 +50,7 @@ class LicenseService
         if ($now->greaterThan($expiresAt)) {
             return [
                 'active' => false,
+                'is_valid' => false,
                 'is_lifetime' => false,
                 'type' => $type,
                 'code' => $code,
@@ -70,6 +73,7 @@ class LicenseService
 
         return [
             'active' => true,
+            'is_valid' => true,
             'is_lifetime' => false,
             'type' => $type,
             'code' => $code,

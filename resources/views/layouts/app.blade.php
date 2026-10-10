@@ -859,13 +859,13 @@
         <div class="topbar-right" style="display:flex; align-items:center; gap:12px;">
             {{-- License Status Indicator --}}
             @php $currentLicense = \App\Services\LicenseService::check(); @endphp
-            @if($currentLicense['is_lifetime'])
+            @if(!empty($currentLicense['is_lifetime']))
                 <span style="display:inline-flex; align-items:center; gap:5px; background:#ecfdf5; color:#065f46; border:1px solid #a7f3d0; padding:4px 10px; border-radius:20px; font-size:11.5px; font-weight:700;">
                     <i class="bi bi-patch-check-fill" style="color:#10b981;"></i> আজীবন লাইসেন্স
                 </span>
-            @elseif($currentLicense['is_valid'])
-                <span style="display:inline-flex; align-items:center; gap:5px; background:#eff6ff; color:#1e40af; border:1px solid #bfdbfe; padding:4px 10px; border-radius:20px; font-size:11.5px; font-weight:700;" title="মেয়াদ শেষ: {{ $currentLicense['expires_at'] ? $currentLicense['expires_at']->format('d/m/Y h:i A') : '' }}">
-                    <i class="bi bi-clock-history" style="color:#3b82f6;"></i> মেয়াদ: {{ $currentLicense['remaining_human'] }}
+            @elseif(!empty($currentLicense['is_valid']))
+                <span style="display:inline-flex; align-items:center; gap:5px; background:#eff6ff; color:#1e40af; border:1px solid #bfdbfe; padding:4px 10px; border-radius:20px; font-size:11.5px; font-weight:700;" title="মেয়াদ শেষ: {{ !empty($currentLicense['expires_at']) ? $currentLicense['expires_at']->format('d/m/Y h:i A') : '' }}">
+                    <i class="bi bi-clock-history" style="color:#3b82f6;"></i> মেয়াদ: {{ $currentLicense['remaining_human'] ?? '' }}
                 </span>
             @else
                 <a href="{{ route('license.activate') }}" style="display:inline-flex; align-items:center; gap:5px; background:#fef2f2; color:#991b1b; border:1px solid #fecaca; padding:4px 10px; border-radius:20px; font-size:11.5px; font-weight:700; text-decoration:none;">
@@ -923,7 +923,7 @@
             <i class="bi bi-exclamation-circle-fill"></i> {{ session('error') }}
         </div>
         @endif
-        @if($errors->any())
+        @if(isset($errors) && $errors->any())
         <div class="alert alert-error">
             <i class="bi bi-exclamation-triangle-fill"></i>
             <div>@foreach($errors->all() as $error)<div>{{ $error }}</div>@endforeach</div>
