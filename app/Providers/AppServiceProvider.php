@@ -21,6 +21,10 @@ class AppServiceProvider extends ServiceProvider
     {
         \Illuminate\Pagination\Paginator::useBootstrap();
         \Illuminate\Pagination\Paginator::defaultView("vendor.pagination.default");
-        //
+
+        // Enforce HTTPS behind reverse proxies (Render / Cloudflare / Heroku)
+        if (app()->environment('production') || request()->header('X-Forwarded-Proto') === 'https' || str_contains(request()->url(), 'onrender.com')) {
+            \Illuminate\Support\Facades\URL::forceScheme('https');
+        }
     }
 }

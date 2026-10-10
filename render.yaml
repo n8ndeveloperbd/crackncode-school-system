@@ -8,6 +8,10 @@ services:
     envVars:
       - key: APP_NAME
         value: CrackNCode
+      - key: APP_URL
+        value: https://crackncode-school.onrender.com
+      - key: ASSET_URL
+        value: https://crackncode-school.onrender.com
       - key: APP_ENV
         value: production
       - key: APP_DEBUG

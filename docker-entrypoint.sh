@@ -11,7 +11,8 @@ php artisan storage:link || true
 # Run database migrations and seed default CrackNCode data
 php artisan migrate --force --seed
 
-# Optimize Laravel cache
+# Clear and optimize Laravel cache
+php artisan optimize:clear
 php artisan config:cache
 php artisan route:cache
 php artisan view:cache
