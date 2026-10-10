@@ -56,9 +56,9 @@ class LicenseService
             ];
         }
 
-        $diffMinutes = $now->diffInMinutes($expiresAt);
-        $diffHours = $now->diffInHours($expiresAt);
-        $diffDays = $now->diffInDays($expiresAt);
+        $diffMinutes = (int) $now->diffInMinutes($expiresAt);
+        $diffHours = (int) $now->diffInHours($expiresAt);
+        $diffDays = (int) ceil($now->diffInHours($expiresAt) / 24);
 
         if ($diffMinutes < 60) {
             $remainingText = "{$diffMinutes} মিনিট বাকি";
